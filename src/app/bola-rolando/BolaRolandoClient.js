@@ -9,7 +9,7 @@ import TitlePage from "@/components/ui/TitlePage";
 import { useSearchParams } from "next/navigation";
 import GerarOutroConteudo from "@/components/ui/GerarOutroConteudo";
 
-export default function Page() {
+export default function BolaRolandoClient() {
 	const searchParams = useSearchParams();
 	const { setConteudoGerado } = useGeneratedContent();
 

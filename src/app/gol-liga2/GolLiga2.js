@@ -13,7 +13,7 @@ import { useSearchParams } from "next/navigation";
 import TitlePage from "@/components/ui/TitlePage";
 import GerarOutroConteudo from "@/components/ui/GerarOutroConteudo";
 
-export default function page() {
+export default function GolLiga2() {
 	const searchParams = useSearchParams();
 	const { setConteudoGerado } = useGeneratedContent();
 
