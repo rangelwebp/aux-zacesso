@@ -1,10 +1,8 @@
 "use client";
 
-// 1. Importar o useEffect do React
-import { useState, useMemo, useEffect } from "react";
-
 import clubesSegundaLiga from "./../data/clubesSegundaLiga";
 import clubesLiga3 from "./../data/clubesLiga3";
+import { useState, useMemo } from "react";
 import { GeneratedContentBlock } from "../components/GeneratedContentBlock";
 import { useGeneratedContent } from "../contexts/GeneratedContentContext";
 import TitlePage from "@/components/ui/TitlePage";
@@ -23,32 +21,23 @@ export default function BolaRolandoClient() {
 		searchParams.get("timeFora") || ""
 	);
 	const [estadio, setEstadio] = useState("");
+
 	const [cidade, setCidade] = useState("");
 
+	// Lista dinâmica conforme a liga
 	const clubes = useMemo(() => {
 		return liga === "Segunda Liga" ? clubesSegundaLiga : clubesLiga3;
 	}, [liga]);
 
-	// 2. Adicionar o hook useEffect para sincronizar os dados do time da casa
-	useEffect(() => {
-		// Se o timeCasa tiver um valor (vindo da URL ou do select)
-		if (timeCasa) {
-			const clube = clubes.find((c) => c.nome === timeCasa);
-			if (clube) {
-				setEstadio(clube.estadio);
-				setCidade(clube.cidade);
-			}
-		} else {
-			// Se o timeCasa for limpo, limpa também o estádio e a cidade
-			setEstadio("");
-			setCidade("");
-		}
-	}, [timeCasa, clubes]); // Dependências: Roda sempre que 'timeCasa' ou a lista 'clubes' mudar
-
-	// 3. Agora a função 'atualizar' fica mais simples
 	const atualizarInfoTimeCasa = (time) => {
-		setTimeCasa(time); // Apenas atualiza o time, o useEffect cuida do resto
+		const clube = clubes.find((c) => c.nome === time);
+		setTimeCasa(time);
+		if (clube) {
+			setEstadio(clube.estadio);
+			setCidade(clube.cidade);
+		}
 
+		// Se o time da casa e visitante forem iguais, limpa o time visitante
 		if (time === timeFora) {
 			setTimeFora("");
 		}
@@ -75,6 +64,7 @@ NO ${estadio.toUpperCase()}
 		setConteudoGerado(post);
 	};
 
+	// Imagens conforme liga
 	const imagens = useMemo(() => {
 		if (liga === "Liga 3") {
 			const escudoCasa = clubes.find((c) => c.nome === timeCasa)?.escudo;
@@ -101,7 +91,6 @@ NO ${estadio.toUpperCase()}
 	}, [liga, timeCasa, timeFora, estadio, clubes]);
 
 	return (
-		// O seu JSX continua exatamente o mesmo aqui
 		<div className="space-y-4">
 			<TitlePage title="Bola Rolando" subtitle={liga} />
 
@@ -113,7 +102,7 @@ NO ${estadio.toUpperCase()}
 						setLiga(e.target.value);
 						setTimeCasa("");
 						setTimeFora("");
-						// Não precisa mais do setEstadio("") aqui, o useEffect cuidará disso
+						setEstadio("");
 					}}
 					className="w-full p-2 border border-gray-600 bg-gray-800 rounded-md">
 					<option value="Segunda Liga">Segunda Liga</option>

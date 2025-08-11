@@ -12,9 +12,9 @@ const clubesLiga3 = [
 		escudo: "images/escudos/liga3/sjv.jpg",
 	},
 	{
-		nome: "Oliveirense",
-		estadio: "Estádio Carlos Osório",
-		escudo: "images/escudos/liga3/oliveirense.jpg",
+		nome: "Marco 09",
+		estadio: "Estádio Municipal do Marco de Canaveses",
+		escudo: "images/escudos/liga3/marco.jpg",
 	},
 	{
 		nome: "Caldas SC",
