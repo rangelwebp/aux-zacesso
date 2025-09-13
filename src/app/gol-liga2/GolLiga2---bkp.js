@@ -11,6 +11,7 @@ import { useGeneratedContent } from "@/contexts/GeneratedContentContext";
 import { useSearchParams } from "next/navigation";
 
 import TitlePage from "@/components/ui/TitlePage";
+import GerarOutroConteudo from "@/components/ui/GerarOutroConteudo";
 
 export default function GolLiga2() {
 	const searchParams = useSearchParams();
@@ -28,54 +29,57 @@ export default function GolLiga2() {
 	const [placarFora, setPlacarFora] = useState("0");
 
 	const [tempoJogo, setTempoJogo] = useState("");
+	// const [rodada, setRodada] = useState(searchParams.get("rodada") || "");
 	const [autorGol, setAutorGol] = useState("");
-
-	// NOVO ESTADO: Para o jogador que deu a assistência
-	const [assistencia, setAssistencia] = useState("");
-
-	// NOVO ESTADO: Para a etapa do jogo (1º ou 2º tempo)
-	const [etapaJogo, setEtapaJogo] = useState("1º Tempo");
-
-	// Estados não utilizados no novo formato, mas mantidos caso precise
 	const [nacionalidadeSelecionada, setNacionalidadeSelecionada] =
 		useState("Portugal");
-	// const [rodada, setRodada] = useState(searchParams.get("rodada") || "");
 	// const [comentarioGol, setComentarioGol] = useState("");
 
 	const gerarPost = () => {
+		const emoji = getEmojiNacionalidade(nacionalidadeSelecionada);
 		const placarCasaEmoji = converterParaEmoji(placarCasa);
 		const placarForaEmoji = converterParaEmoji(placarFora);
 
-		// Constrói a linha de assistência apenas se o campo estiver preenchido
-		const linhaAssistencia = assistencia ? `🅰️ ${assistencia}\n\n` : "";
+		let post = `⚽ GOOOL DO ${timeGol.toUpperCase()}
 
-		let post = `🔔 GOL DO ${timeGol.toUpperCase()}
+${timeCasa} ${placarCasaEmoji}-${placarForaEmoji} ${timeFora}
 
-⚽️ ${autorGol}
-${linhaAssistencia}⌚️ ${tempoJogo}' | ${etapaJogo}
+⏰ ${tempoJogo}' —— ${
+			emoji
+				? `${emoji} ${autorGol} marcou para o ${timeGol}`
+				: `${autorGol} marcou para o ${timeGol}`
+		}
 
-🆚 ${timeCasa} ${placarCasaEmoji}-${placarForaEmoji} ${timeFora}`;
+🏆 #LigaPortugal2`;
 
 		setConteudoGerado(post);
 	};
 
+	// --- LÓGICA PRINCIPAL DA IMAGEM ---
 	const imagemGol = useMemo(() => {
+		// Se nenhum time foi selecionado para o gol, retorna um array vazio
 		if (!timeGol) {
 			return [];
 		}
+
+		// Encontra o clube correspondente no array de dados
 		const clube = clubesSegundaLiga.find((c) => c.nome === timeGol);
+
+		// Se o clube for encontrado e tiver a propriedade 'gol'
 		if (clube && clube.gol) {
+			// Retorna o array no formato que o GeneratedContentBlock espera
 			return [{ src: clube.gol, alt: `Imagem de gol do ${clube.nome}` }];
 		}
+
+		// Caso contrário, retorna um array vazio
 		return [];
-	}, [timeGol]);
+	}, [timeGol]); // O hook será re-executado sempre que 'timeGol' mudar
 
 	return (
 		<div>
 			<div className="space-y-4">
 				<TitlePage title="Gol" subtitle="Segunda Liga" />
 				<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-					{/* Time da Casa */}
 					<div>
 						<label className="block text-sm font-medium mb-1">
 							Time da Casa
@@ -93,7 +97,6 @@ ${linhaAssistencia}⌚️ ${tempoJogo}' | ${etapaJogo}
 						</select>
 					</div>
 
-					{/* Time Visitante */}
 					<div>
 						<label className="block text-sm font-medium mb-1">
 							Time Visitante
@@ -113,7 +116,6 @@ ${linhaAssistencia}⌚️ ${tempoJogo}' | ${etapaJogo}
 						</select>
 					</div>
 
-					{/* Time que marcou o gol */}
 					<div>
 						<label className="block text-sm font-medium mb-1">
 							Time que marcou o gol
@@ -132,7 +134,6 @@ ${linhaAssistencia}⌚️ ${tempoJogo}' | ${etapaJogo}
 						</select>
 					</div>
 
-					{/* Placar */}
 					<div>
 						<label className="block text-sm font-medium mb-1">
 							Placar
@@ -154,33 +155,6 @@ ${linhaAssistencia}⌚️ ${tempoJogo}' | ${etapaJogo}
 						</div>
 					</div>
 
-					{/* Autor do Gol */}
-					<div>
-						<label className="block text-sm font-medium mb-1">
-							Autor do Gol
-						</label>
-						<input
-							type="text"
-							className="w-full rounded-md border-gray-600 p-2 border"
-							value={autorGol}
-							onChange={(e) => setAutorGol(e.target.value)}
-						/>
-					</div>
-
-					{/* NOVO CAMPO: Assistência */}
-					<div>
-						<label className="block text-sm font-medium mb-1">
-							Assistência (opcional)
-						</label>
-						<input
-							type="text"
-							className="w-full rounded-md border-gray-600 p-2 border"
-							value={assistencia}
-							onChange={(e) => setAssistencia(e.target.value)}
-						/>
-					</div>
-
-					{/* Tempo de Jogo */}
 					<div>
 						<label className="block text-sm font-medium mb-1">
 							Tempo de Jogo (min)
@@ -193,22 +167,65 @@ ${linhaAssistencia}⌚️ ${tempoJogo}' | ${etapaJogo}
 						/>
 					</div>
 
-					{/* NOVO CAMPO: Etapa do Jogo */}
 					<div>
 						<label className="block text-sm font-medium mb-1">
-							Etapa do Jogo
+							Rodada
+						</label>
+						<input
+							type="number"
+							className="w-full rounded-md border-gray-600 p-2 border"
+							value={rodada}
+							onChange={(e) => setRodada(e.target.value)}
+						/>
+					</div>
+
+					<div>
+						<label className="block text-sm font-medium mb-1">
+							Autor do Gol
+						</label>
+						<input
+							type="text"
+							className="w-full rounded-md border-gray-600 p-2 border"
+							value={autorGol}
+							onChange={(e) => setAutorGol(e.target.value)}
+						/>
+					</div>
+
+					<div>
+						<label className="block text-sm font-medium mb-1">
+							Nacionalidade do Jogador
 						</label>
 						<select
 							className="w-full rounded-md border-gray-600 bg-gray-800 p-2 border"
-							value={etapaJogo}
-							onChange={(e) => setEtapaJogo(e.target.value)}>
-							<option value="1º Tempo">1º Tempo</option>
-							<option value="2º Tempo">2º Tempo</option>
-							<option value="Prorrogação">Prorrogação</option>
+							value={nacionalidadeSelecionada}
+							onChange={(e) =>
+								setNacionalidadeSelecionada(e.target.value)
+							}>
+							{nacionalidades.map((nacionalidade) => (
+								<option
+									key={nacionalidade.nome}
+									value={nacionalidade.nome}>
+									{nacionalidade.emoji
+										? `${nacionalidade.emoji} ${nacionalidade.nome}`
+										: nacionalidade.nome}
+								</option>
+							))}
 						</select>
 					</div>
 
 					<div className="sm:col-span-2">
+						<label className="block text-sm font-medium mb-1">
+							Comentário sobre o gol (opcional)
+						</label>
+						<textarea
+							className="w-full rounded-md border-gray-600 bg-gray-800 p-2 border"
+							rows="3"
+							value={comentarioGol}
+							onChange={(e) => setComentarioGol(e.target.value)}
+							placeholder="Ex: Grande finalização! Um golaço inacreditável!"></textarea>
+					</div>
+
+					<div className="">
 						<button
 							onClick={gerarPost}
 							className="bg-emerald-600 hover:bg-emerald-700 text-white py-2 px-6 rounded-md transition duration-200">

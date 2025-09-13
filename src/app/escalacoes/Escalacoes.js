@@ -47,8 +47,8 @@ export default function Escalacoes() {
 🏆 #LigaPortugal2 | Rodada ${rodada}
 ⏰ Hoje, daqui a pouco às ${horario}
 🏟️ ${estadio}
-${sportTV ? "📺 @sporttvportugal" : ""}
-📲 Acompanhe nossa cobertura!
+
+🧶 Acompanhe no fio ⤵️
 `;
 		setConteudoGerado(post);
 	};
