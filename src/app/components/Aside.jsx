@@ -42,6 +42,11 @@ export default function Aside({ className }) {
 					href="/revisor">
 					📝 <span className="hidden sm:inline">Revisor</span>
 				</Link>
+				<Link
+					className="text-4xl sm:text-base font-medium"
+					href="/relatos">
+					📃 <span className="hidden sm:inline">Relatos</span>
+				</Link>
 			</div>
 			<footer className="hidden sm:block">
 				<small>Criado por Rangel Xavier</small>
